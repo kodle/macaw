@@ -3,129 +3,104 @@ import string
 import os
 import json
 
-# Author: Kodle, Giiltham
+# Authors: Kodle, Giiltham
 # https://github.com/Lunarly
 
-print('Hello world! Welcome on Macaw.\nWrite help to see commands.\n')
-
-
-def createJsonFile(path):
-    f = open(path,"a+")
-    f.seek(0)
-    if f.read() == "":
-        f.write("{}")    
-    f.close()
+class macaw:
     
-def loadJsonFile(path):
-    f = open(path,"r+")
-    data = json.loads(f.read())
-    f.close()
-    return data
-
-def saveJson(path):
-    f = open(path,"w")
-    json.dump(data,f)
-
-def randChar(x):
-    return random.sample(string.ascii_letters, x)
+    def __init__(self, Fpath):
+        self.data = self.loadJsonFile(Fpath)
+        self.path = Fpath
     
-def randNum(y):
-    digits = []
-    for i in range(y):
-        digits.append(str(random.randint(1,9)))
-    return digits
-
-def randSymb(z):
-    special = []
-    for i in range(z):
-        special.append(random.choice('!$%&()*+,-.:;<=>?@[]^_`{|}~'))
-    return special
-
-def createPass():
-    title = input('Name > ')
-    if title in data:
-        print('Password already exist, use modify command.')
-        return
-    generatePass(title)
-    
-def modifyPass():
-    title = input('Name > ')
-    if (not title in data):
-        print('Password doesn\'t exist')
-        return
-    generatePass(title)
-
-def deletePass():
-    delete = input('Delete > ')
-    if delete in data:
-        del data[delete]
-        print(delete+' has been deleted.')
-        saveJson('pass.json')  
-    else:
-        print('Password doesn\'t exist.')       
+    def createJsonFile(self, path):
+        f = open(path,"a+")
+        f.seek(0)
+        if f.read() == "":
+            f.write("{}")    
+        f.close()
         
-def generatePass(title):
-    char = input('Characters > ')
-    num = input('Numbers > ')
-    symb = input('Symbols > ')
+    def loadJsonFile(self, path):
+        self.createJsonFile(path)
+        f = open(path,"r+")
+        self.data = json.loads(f.read())
+        f.close()
+        return self.data
 
-    passw = randChar(int(char)) + randNum(int(num)) + randSymb(int(symb))
-    random.shuffle(passw)
-    
-    savePass(title, passw)
-    
-def savePass(title, passw):
-    data[title] = ''.join(passw)
+    def saveJson(self,path):
+        f = open(self.path,"w")
+        json.dump(self.data,f)
 
-    print('\n' + title + ' : ' + ''.join(passw) + '\n' + 'Saved in pass.json')
-
-    saveJson(jsonFileName)
-
-def searchPass():
-    search = input('Search > ')
-    if search in data:
-        print(search + ' : ' + data[search])
-    else:
-        print('Password doesn\'t exist')
-
-def listPass():
-    for key in data.keys():
-        print(key)
-    
-def help():
-    print('create - generate password \nmodify - modify password \ndelete - delete a password \nsearch - search a password \nlist - list of password \nexit - exit command')
-
-jsonFileName = "pass.json"
-
-createJsonFile(jsonFileName)
-
-data = loadJsonFile(jsonFileName)
-    
-    
-while(True):
-    cmd = input('Command > ')
-
-    if cmd == 'create':
-        createPass()
+    def randChar(self,x):
+        return random.sample(string.ascii_letters, x)
         
-    elif cmd == 'modify':
-        modifyPass()
+    def randNum(self,y):
+        digits = []
+        for i in range(y):
+            digits.append(str(random.randint(1,9)))
+        return digits
 
-    elif cmd == 'delete':
-        deletePass()
+    def randSymb(self,z):
+        special = []
+        for i in range(z):
+            special.append(random.choice('!$%&()*+,-.:;<=>?@[]^_`{|}~'))
+        return special
 
-    elif cmd == 'search':
-        searchPass()
+    def createPass(self, title):
+        if title in self.data:
+            print('Password already exist, use modify command.')
+            return
+        self.generatePass(title)
         
-    elif cmd == 'list':
-        listPass()
+    def modifyPass(self, title):
+        if (not title in self.data):
+            print('Password doesn\'t exist')
+            return
+        self.generatePass(title)
 
-    elif cmd == 'help':
-        help()
+    def deletePass(self, title):
+        if title in self.data:
+            del self.data[title]
+            print(title+' has been deleted.')
+            self.saveJson(self.path)  
+        else:
+            print('Password doesn\'t exist.')       
+            
+    def generatePass(self, title):
+        char = input('Characters > ')
+        num = input('Numbers > ')
+        symb = input('Symbols > ')
 
-    elif cmd == 'exit':
-        print('Goodbye!')
-        break
+        passw = self.randChar(int(char)) + self.randNum(int(num)) + self.randSymb(int(symb))
+        random.shuffle(passw)
+        
+        self.savePass(title, passw)
 
-    else:
-        print('Command doesn\'t exist. Use help to show commands.')
+    def savePass(self, title, passw):
+        self.data[title] = ''.join(passw)
+
+        print('\n' + title + ' : ' + ''.join(passw) + '\n' + 'Saved in pass.json')
+
+        self.saveJson(self.path)
+
+    def searchPass(self,title):
+        if title in self.data:
+            print(title + ' : ' + self.data[title])
+        else:
+            print('Password doesn\'t exist')
+
+    def listPass(self):
+        for key in self.data.keys():
+            print(key)
+
+    def commands(self):
+        print('create - generate password \nmodify - modify password \ndelete - delete a password \nsearch - search a password \nlist - list of password \nexit - exit command')
+
+jsonFileName = 'pass.json'
+
+_init = macaw(jsonFileName)
+createPass = _init.createPass
+modifyPass = _init.modifyPass
+deletePass = _init.deletePass
+searchPass = _init.searchPass
+listPass = _init.listPass
+commands = _init.commands
